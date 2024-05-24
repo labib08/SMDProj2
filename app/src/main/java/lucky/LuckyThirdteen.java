@@ -38,6 +38,7 @@ public class LuckyThirdteen extends CardGame {
     private final Location textLocation = new Location(350, 450);
     private int thinkingTime = 2000;
     private int delayTime = 600;
+    private HashMap<Integer, Integer> possibleCardsMap = new HashMap<>();
     public void setStatus(String string) {
         setStatusText(string);
     }
@@ -81,10 +82,28 @@ public class LuckyThirdteen extends CardGame {
     }
 
     private Card selected;
-
+    public void initPossibleCardsMap(HashMap<Integer, Integer> map, List<Card> packList) {
+        for (int i =0; i< packList.size(); i++) {
+            Rank cardRank = (Rank)packList.get(i).getRank();
+            addPossibleValues(map, cardRank.getPossibleSumValues());
+        }
+    }
+    public void addPossibleValues(HashMap<Integer, Integer> map, int[] possibleValues) {
+        for (int cardValue : possibleValues) {
+            if (map.containsKey(cardValue)) {
+                map.put(cardValue, map.get(cardValue) + 1);
+            }
+            else {
+                map.put(cardValue, 1);
+            }
+        }
+    }
     private void initGame() {
         pack = deck.toHand(false);
         cardsDealer.setPack(pack);
+        if (possibleCardsMap.isEmpty()) {
+            initPossibleCardsMap(possibleCardsMap, pack.getCardList());
+        }
         for (int i = 0; i < nbPlayers; i++) {
             players[i].setHand(new Hand(deck)); // sets up a hand for each player
 
@@ -103,13 +122,30 @@ public class LuckyThirdteen extends CardGame {
         // graphics
         cardGraphics.setUpPlayerGraphics(this, players);
     }
-
+    public void removePossibleValues(HashMap<Integer, Integer> map,int[] possibleValues) {
+        for (int cardValue : possibleValues) {
+            if (map.containsKey(cardValue)) {
+                map.put(cardValue, map.get(cardValue)-1);
+            }
+        }
+    }
+    public void removePrivAndPubCard(HashMap<Integer, Integer> map, List<Card> privateCards, List<Card> publicCards) {
+        Rank cardRank = null;
+        for (int i =0; i< 2; i++) {
+            cardRank = (Rank)privateCards.get(i).getRank();
+            removePossibleValues(map, cardRank.getPossibleSumValues());
+        }
+        for (int i =0; i< 2; i++) {
+            cardRank = (Rank)publicCards.get(i).getRank();
+            removePossibleValues(map, cardRank.getPossibleSumValues());
+        }
+    }
     private void playGame() {
         // End trump suit
         int winner = 0;
         int roundNumber = 1;
         scoreGraphics.updateScore(this, players);
-
+        boolean isFirstTurnClever = true;
         List<Card>cardsPlayed = new ArrayList<>();
         resultLogger.addRoundInfoToLog(roundNumber);
 
@@ -117,7 +153,11 @@ public class LuckyThirdteen extends CardGame {
         while(roundNumber <= 4) {
             selected = null;
             boolean finishedAuto = false;
-
+            if ((players[currentPlayer] instanceof CleverPlayer) && (isFirstTurnClever == true)) {
+                removePrivAndPubCard(possibleCardsMap, players[currentPlayer].getHand().getCardList(), playingArea.getCardList());
+                System.out.println(possibleCardsMap);
+                isFirstTurnClever = false;
+            }
             if (isAuto) {
                 int currentPlayerAutoIndex = autoIndexHands[currentPlayer];
                 List<String> currentPlayerMovement = players[currentPlayer].getMovements();
@@ -136,7 +176,7 @@ public class LuckyThirdteen extends CardGame {
                     if (selected != null) {
                         selected.removeFromHand(true);
                     } else { // for when player runs out of auto movement sequence
-                        selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed);
+                        selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed, possibleCardsMap);
                         selected.removeFromHand(true);
                     }
                 } else {
@@ -149,7 +189,7 @@ public class LuckyThirdteen extends CardGame {
                     HumanPlayer current = (HumanPlayer) players[currentPlayer];
                     setStatus("Player 0 is playing. Please double click on a card to discard");
                     cardsDealer.dealACardToHand(current.getHand(), pack);
-                    selected = current.selectCardToDiscard(delayTime, playingArea, cardsPlayed);
+                    selected = current.selectCardToDiscard(delayTime, playingArea, cardsPlayed, possibleCardsMap);
                     selected.removeFromHand(true);
 
 //                } else if (players[currentPlayer] instanceof CleverPlayer) {
@@ -160,7 +200,7 @@ public class LuckyThirdteen extends CardGame {
 
                 }   else { // non-human player picking
                     setStatusText("Player " + currentPlayer + " thinking...");
-                    selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed);
+                    selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed, possibleCardsMap);
                     selected.removeFromHand(true);
                 }
             }

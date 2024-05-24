@@ -14,7 +14,7 @@ public class HumanPlayer extends Player {
         super(position, cardsDealer);
     }
 
-    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed){
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map){
         getHand().setTouchEnabled(true);
         selected = null;
         while (null == selected) delay(delayTime);

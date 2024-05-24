@@ -11,9 +11,10 @@ import java.util.*;
 public class CleverPlayer extends Player {
     int THIRTEEN_GOAL = 13;
     Hand playingArea;
-//    List<Card>cardsPlayed = new ArrayList<>();
+    List<Card>cardsPlayed = new ArrayList<>();
 
     List <Integer> cardType = new ArrayList<>();
+    HashMap<Integer, Integer> map = new HashMap<>();
     private int getScorePublicCard(Card card) {
         Rank rank = (Rank) card.getRank();
         return rank.getScoreCardValue() * Suit.PUBLIC_CARD_MULTIPLICATION_FACTOR;
@@ -329,15 +330,16 @@ public class CleverPlayer extends Player {
         super(position, cardsDealer);
     }
 
-    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map) {
         this.playingArea = playingArea;
-
-        Card selected = getCleverPlayerCard(getHand(), getPosition(), cardsPlayed, getCardsDealer().getPack().getCardList(), possibleCardsMap, delayTime);
+        this.map = map;
+        this.cardsPlayed = cardsPlayed;
+        Card selected = getCleverPlayerCard(getHand(), getPosition(), cardsPlayed, getCardsDealer().getPack().getCardList(), map, delayTime);
         return selected;
     }
 
     private List<PlayerObserver> observers = new ArrayList<>();
-    HashMap<Integer, Integer> possibleCardsMap = new HashMap<>();
+
 
     public void registerObserver(PlayerObserver observer) {
         observers.add(observer);
@@ -359,7 +361,12 @@ public class CleverPlayer extends Player {
         int minFreq = 57;
         for (int i=0; i<reqScorePriv1.size(); i++) {
             if (map.containsKey(reqScorePriv1.get(i))) {
-                freq += map.get(reqScorePriv1.get(i));
+                if (reqScorePriv1.get(i) == 0 || reqScorePriv1.get(i) == 1) {
+                    freq += map.get(0) + map.get(1);
+                }
+                else {
+                    freq += map.get(reqScorePriv1.get(i));
+                }
             }
         }
         System.out.println(freq);
@@ -371,7 +378,12 @@ public class CleverPlayer extends Player {
         freq = 0;
         for (int i=0; i<reqScorePriv2.size(); i++) {
             if (map.containsKey(reqScorePriv2.get(i))) {
-                freq += map.get(reqScorePriv2.get(i));
+                if (reqScorePriv2.get(i) == 0 || reqScorePriv2.get(i) == 1) {
+                    freq += map.get(0) + map.get(1);
+                }
+                else {
+                    freq += map.get(reqScorePriv2.get(i));
+                }
             }
         }
         System.out.println(freq);
@@ -389,7 +401,12 @@ public class CleverPlayer extends Player {
         freq = 0;
         for (int i=0; i<reqScorePriv3.size(); i++) {
             if (map.containsKey(reqScorePriv3.get(i))) {
-                freq += map.get(reqScorePriv3.get(i));
+                if (reqScorePriv3.get(i) == 0 || reqScorePriv3.get(i) == 1) {
+                    freq += map.get(0) + map.get(1);
+                }
+                else {
+                    freq += map.get(reqScorePriv3.get(i));
+                }
             }
         }
         System.out.println(freq);
@@ -404,10 +421,11 @@ public class CleverPlayer extends Player {
             minFreq = freq;
             num = 2;
         }
-
-
+        System.out.println("Lowest == " + privateCards.get(num));
+        /**
         for (int j =0; j< privateCards.size(); j++) {
             Rank rank = (Rank)privateCards.get(j).getRank();
+            System.out.println(freq + " " + privateCards.get(j));
             freq = 0;
             for (int i =0; i< reqScorePrivCards.size(); i++) {
                 freq += getAllPossibleFreq(rank.getPossibleSumValues(), reqScorePrivCards.get(i), map);
@@ -420,11 +438,14 @@ public class CleverPlayer extends Player {
                 }
             }
             if (freq < minFreq) {
+                System.out.println(freq);
+                System.out.println(privateCards.get(j));
+                System.out.println(j);
                 minFreq = freq;
                 num = j;
             }
         }
-        System.out.println("Lowest == " + privateCards.get(num));
+        */
         return privateCards.get(num);
     }
     public int getAllPossibleFreq(int[] possibleValues, int sum, HashMap<Integer, Integer> map) {

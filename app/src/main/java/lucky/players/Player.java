@@ -6,6 +6,7 @@ import lucky.CardsDealer;
 import lucky.LuckyThirdteen;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class Player extends Actor {
@@ -25,7 +26,7 @@ public abstract class Player extends Actor {
         return cardsDealer;
     }
 
-    public abstract Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed);
+    public abstract Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map);
 
     public void setUpInitialCards(Card[] initialCards){ // sets up hand
         for (Card card : initialCards){

@@ -12,7 +12,7 @@ public class RandomPlayer extends Player {
     }
 
     @Override
-    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map) {
         return getRandomCard(getHand(), delayTime);
     }
 

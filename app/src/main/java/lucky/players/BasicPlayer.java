@@ -12,7 +12,7 @@ public class BasicPlayer extends Player {
         Suit suit = (Suit) card.getSuit();
         return rank.getScoreCardValue() * suit.getMultiplicationFactor();
     }
-    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map) {
         Card selected = getLowestScoreCard(getHand(), delayTime);
         return selected;
     }
