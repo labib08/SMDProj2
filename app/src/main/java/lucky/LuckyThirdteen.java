@@ -5,10 +5,7 @@ import ch.aplu.jgamegrid.*;
 import lucky.gameFunctions.CardGraphics;
 import lucky.gameFunctions.ResultLogger;
 import lucky.gameFunctions.ScoreGraphics;
-import lucky.players.CleverPlayer;
-import lucky.players.HumanPlayer;
-import lucky.players.Player;
-import lucky.players.PlayerFactory;
+import lucky.players.*;
 import lucky.scoring.ScoringOperations;
 import lucky.summing.SummingOperations;
 
@@ -17,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class LuckyThirdteen extends CardGame {
+public class LuckyThirdteen extends CardGame implements Subject {
     final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
 
     static public final int seed = 30008;
@@ -153,10 +150,12 @@ public class LuckyThirdteen extends CardGame {
         while(roundNumber <= 4) {
             selected = null;
             boolean finishedAuto = false;
-            if ((players[currentPlayer] instanceof CleverPlayer) && (isFirstTurnClever == true)) {
-                removePrivAndPubCard(possibleCardsMap, players[currentPlayer].getHand().getCardList(), playingArea.getCardList());
-                System.out.println(possibleCardsMap);
-                isFirstTurnClever = false;
+            if (players[currentPlayer] instanceof CleverPlayer) {
+                if (isFirstTurnClever == true) {
+                    removePrivAndPubCard(possibleCardsMap, players[currentPlayer].getHand().getCardList(), playingArea.getCardList());
+                    isFirstTurnClever = false;
+                }
+
             }
             if (isAuto) {
                 int currentPlayerAutoIndex = autoIndexHands[currentPlayer];
@@ -192,11 +191,6 @@ public class LuckyThirdteen extends CardGame {
                     selected = current.selectCardToDiscard(delayTime, playingArea, cardsPlayed, possibleCardsMap);
                     selected.removeFromHand(true);
 
-//                } else if (players[currentPlayer] instanceof CleverPlayer) {
-//                    CleverPlayer current = (CleverPlayer) players[currentPlayer];
-//
-//
-//                }
 
                 }   else { // non-human player picking
                     setStatusText("Player " + currentPlayer + " thinking...");
@@ -207,7 +201,13 @@ public class LuckyThirdteen extends CardGame {
 
             resultLogger.addCardPlayedToLog(currentPlayer, players[currentPlayer].getHand().getCardList(), ranks, suits);
             if (selected != null) {
-                cardsPlayed.add(selected);
+                if (!(players[currentPlayer] instanceof CleverPlayer)) {
+                    cardsPlayed.add(selected);
+                    notifyObservers(selected);
+                }
+                else {
+                    cardsPlayed.clear();
+                }
                 selected.setVerso(false);  // In case it is upside down
                 delay(delayTime);
                 // End Follow
@@ -236,6 +236,9 @@ public class LuckyThirdteen extends CardGame {
             String playerType = properties.getProperty("players."+i);
             String autoMovements = properties.getProperty("players."+i+".cardsPlayed");
             players[i] = PlayerFactory.getInstance().getPlayer(playerType, i, cardsDealer);
+            if (players[i] instanceof CleverPlayer) {
+                registerObserver((PlayerObserver) players[i]);
+            }
 
             if (autoMovements != null) {
                 players[i].setUpAutoMovement(autoMovements);
@@ -282,5 +285,23 @@ public class LuckyThirdteen extends CardGame {
         this.summingOperations = new SummingOperations();
         this.scoringOperations = new ScoringOperations();
         this.cardsDealer = new CardsDealer(pack);
+    }
+
+    private List<PlayerObserver> observers = new ArrayList<>();
+    @Override
+    public void registerObserver(PlayerObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(PlayerObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void notifyObservers(Card card) {
+        for (PlayerObserver observer: observers) {
+            observer.update(card);
+        }
     }
 }

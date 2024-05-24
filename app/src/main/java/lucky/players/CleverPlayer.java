@@ -8,11 +8,10 @@ import lucky.Suit;
 
 import java.util.*;
 
-public class CleverPlayer extends Player {
+public class CleverPlayer extends Player implements PlayerObserver{
     int THIRTEEN_GOAL = 13;
     Hand playingArea;
-    List<Card>cardsPlayed = new ArrayList<>();
-
+    private List<Card> cardsPlayedObserver = new ArrayList<>();
     List <Integer> cardType = new ArrayList<>();
     HashMap<Integer, Integer> map = new HashMap<>();
     private int getScorePublicCard(Card card) {
@@ -47,18 +46,6 @@ public class CleverPlayer extends Player {
             }
         }
     }
-//    public void removePrivAndPubCard(HashMap<Integer, Integer> map, List<Card> privateCards, List<Card> publicCards) {
-//        Rank cardRank = null;
-//        for (int i =0; i< 2; i++) {
-//            cardRank = (Rank)privateCards.get(i).getRank();
-//            removePossibleValues(map, cardRank.getPossibleSumValues());
-//        }
-//        for (int i =0; i< 2; i++) {
-//            cardRank = (Rank)publicCards.get(i).getRank();
-//            removePossibleValues(map, cardRank.getPossibleSumValues());
-//        }
-//
-//    }
 
     public void findRequiredScore(List<Integer> reqScore, Card card) {
         Rank rank = (Rank)card.getRank();
@@ -93,10 +80,6 @@ public class CleverPlayer extends Player {
         findRequiredScore(reqScorePriv2, privateCards.get(1));
         findRequiredScore(reqScorePriv3, privateCards.get(2));
         sumPublicCards(reqScorePub, publicCards.get(0), publicCards.get(1));
-        System.out.println(reqScorePriv1);
-        System.out.println(reqScorePriv2);
-        System.out.println(reqScorePriv3);
-        System.out.println(reqScorePub);
         card = findProbability(reqScorePriv1, reqScorePriv2, reqScorePriv3, reqScorePub, map, privateCards);
         return card;
     }
@@ -333,26 +316,9 @@ public class CleverPlayer extends Player {
     public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed, HashMap<Integer, Integer> map) {
         this.playingArea = playingArea;
         this.map = map;
-        this.cardsPlayed = cardsPlayed;
-        Card selected = getCleverPlayerCard(getHand(), getPosition(), cardsPlayed, getCardsDealer().getPack().getCardList(), map, delayTime);
+        Card selected = getCleverPlayerCard(getHand(), getPosition(), getCardsDealer().getPack().getCardList(), map, delayTime);
+        cardsPlayedObserver.clear();
         return selected;
-    }
-
-    private List<PlayerObserver> observers = new ArrayList<>();
-
-
-    public void registerObserver(PlayerObserver observer) {
-        observers.add(observer);
-    }
-
-    public void removeObserver(PlayerObserver observer) {
-        observers.remove(observer);
-    }
-
-    private void notifyObservers(int playerIndex, List<Card> cards) {
-        for (PlayerObserver observer : observers) {
-            observer.notify(playerIndex, cards);
-        }
     }
 
     public Card findProbability(List<Integer> reqScorePriv1, List<Integer> reqScorePriv2, List<Integer> reqScorePriv3, List<Integer> reqScorePrivCards, HashMap<Integer, Integer> map, List<Card> privateCards) {
@@ -369,7 +335,6 @@ public class CleverPlayer extends Player {
                 }
             }
         }
-        System.out.println(freq);
 
         if (freq < minFreq) {
             minFreq = freq;
@@ -386,7 +351,7 @@ public class CleverPlayer extends Player {
                 }
             }
         }
-        System.out.println(freq);
+
         if (freq == minFreq) {
             int currCardVal = getScorePrivateCard(privateCards.get(1));
             int minCardVal = getScorePrivateCard(privateCards.get(num));
@@ -409,7 +374,7 @@ public class CleverPlayer extends Player {
                 }
             }
         }
-        System.out.println(freq);
+
         if (freq == minFreq) {
             int currCardVal = getScorePrivateCard(privateCards.get(2));
             int minCardVal = getScorePrivateCard(privateCards.get(num));
@@ -421,42 +386,8 @@ public class CleverPlayer extends Player {
             minFreq = freq;
             num = 2;
         }
-        System.out.println("Lowest == " + privateCards.get(num));
-        /**
-        for (int j =0; j< privateCards.size(); j++) {
-            Rank rank = (Rank)privateCards.get(j).getRank();
-            System.out.println(freq + " " + privateCards.get(j));
-            freq = 0;
-            for (int i =0; i< reqScorePrivCards.size(); i++) {
-                freq += getAllPossibleFreq(rank.getPossibleSumValues(), reqScorePrivCards.get(i), map);
-            }
-            if (freq == minFreq) {
-                int currCardVal = getScorePrivateCard(privateCards.get(j));
-                int minCardVal = getScorePrivateCard(privateCards.get(num));
-                if (currCardVal < minCardVal) {
-                    num = j;
-                }
-            }
-            if (freq < minFreq) {
-                System.out.println(freq);
-                System.out.println(privateCards.get(j));
-                System.out.println(j);
-                minFreq = freq;
-                num = j;
-            }
-        }
-        */
+
         return privateCards.get(num);
-    }
-    public int getAllPossibleFreq(int[] possibleValues, int sum, HashMap<Integer, Integer> map) {
-        int freq =0;
-        for (int value : possibleValues) {
-            int requiredVal = THIRTEEN_GOAL - (sum + value);
-            if (map.containsKey(requiredVal)) {
-                freq += map.get(requiredVal);
-            }
-        }
-        return freq;
     }
 
     public Card getLowestScoreCard(List <Card> cardList) {
@@ -474,20 +405,17 @@ public class CleverPlayer extends Player {
         return card;
     }
 
-    public Card getCleverPlayerCard(Hand hand, int nextPlayer, List<Card> cardsPlayed, List<Card> packList, HashMap<Integer, Integer> map, int thinkingTime) {
-        System.out.println("CARDS PLAYED ======= " + cardsPlayed);
+    public Card getCleverPlayerCard(Hand hand, int nextPlayer, List<Card> packList, HashMap<Integer, Integer> map, int thinkingTime) {
+
         getCardsDealer().dealACardToHand(hand, getCardsDealer().getPack());
-        System.out.println(packList);
-        System.out.println("Size of CardList == " + packList.size());
-        System.out.println(hand.getCardList());
-        updateMap(map, cardsPlayed, hand.getCardList());
-        System.out.println(("Map: " + map));
+
+        updateMap(map, cardsPlayedObserver, hand.getCardList());
 
         List<Card> cardsToDiscard = new ArrayList<>(hand.getCardList());
         List <Card> isThirteenCardList = new ArrayList<>();
         int score = calculateMaxScoreForThirteenPlayer(nextPlayer, isThirteenCardList, cardType);
         delay(thinkingTime);
-        System.out.println("Score == " + score + " Cards == " + isThirteenCardList + " CardType == " + cardType);
+
         if (score > 0) {
             if (cardType.size() == 2) {
                 if (cardType.contains(0) && cardType.contains(1)) {
@@ -529,5 +457,10 @@ public class CleverPlayer extends Player {
         if (map.containsKey(handCardValue)) {
             map.put(handCardValue, map.get(handCardValue)-1);
         }
+    }
+
+    @Override
+    public void update(Card card) {
+        this.cardsPlayedObserver.add(card);
     }
 }
