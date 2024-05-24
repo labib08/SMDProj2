@@ -4,6 +4,7 @@ import ch.aplu.jcardgame.*;
 import ch.aplu.jcardgame.CardAdapter;
 import ch.aplu.jcardgame.CardListener;
 import lucky.CardsDealer;
+import java.util.*;
 
 public class HumanPlayer extends Player {
 
@@ -13,7 +14,7 @@ public class HumanPlayer extends Player {
         super(position, cardsDealer);
     }
 
-    public Card selectCardToDiscard(int delayTime, Hand playingArea){
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed){
         getHand().setTouchEnabled(true);
         selected = null;
         while (null == selected) delay(delayTime);

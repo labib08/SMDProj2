@@ -3,6 +3,7 @@ package lucky.players;
 import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 import lucky.CardsDealer;
+import java.util.*;
 import lucky.players.Player;
 
 public class RandomPlayer extends Player {
@@ -11,7 +12,7 @@ public class RandomPlayer extends Player {
     }
 
     @Override
-    public Card selectCardToDiscard(int delayTime, Hand playingArea) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
         return getRandomCard(getHand(), delayTime);
     }
 

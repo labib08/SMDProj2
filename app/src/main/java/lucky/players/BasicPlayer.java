@@ -4,6 +4,7 @@ import ch.aplu.jcardgame.*;
 import lucky.CardsDealer;
 import lucky.Rank;
 import lucky.Suit;
+import java.util.*;
 
 public class BasicPlayer extends Player {
     int getScorePrivateCard(Card card) {
@@ -11,7 +12,7 @@ public class BasicPlayer extends Player {
         Suit suit = (Suit) card.getSuit();
         return rank.getScoreCardValue() * suit.getMultiplicationFactor();
     }
-    public Card selectCardToDiscard(int delayTime, Hand playingArea) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
         Card selected = getLowestScoreCard(getHand(), delayTime);
         return selected;
     }

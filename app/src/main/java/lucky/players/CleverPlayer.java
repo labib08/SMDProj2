@@ -11,7 +11,7 @@ import java.util.*;
 public class CleverPlayer extends Player {
     int THIRTEEN_GOAL = 13;
     Hand playingArea;
-    List<Card>cardsPlayed = new ArrayList<>();
+//    List<Card>cardsPlayed = new ArrayList<>();
 
     List <Integer> cardType = new ArrayList<>();
     private int getScorePublicCard(Card card) {
@@ -46,18 +46,18 @@ public class CleverPlayer extends Player {
             }
         }
     }
-    public void removePrivAndPubCard(HashMap<Integer, Integer> map, List<Card> privateCards, List<Card> publicCards) {
-        Rank cardRank = null;
-        for (int i =0; i< 2; i++) {
-            cardRank = (Rank)privateCards.get(i).getRank();
-            removePossibleValues(map, cardRank.getPossibleSumValues());
-        }
-        for (int i =0; i< 2; i++) {
-            cardRank = (Rank)publicCards.get(i).getRank();
-            removePossibleValues(map, cardRank.getPossibleSumValues());
-        }
-
-    }
+//    public void removePrivAndPubCard(HashMap<Integer, Integer> map, List<Card> privateCards, List<Card> publicCards) {
+//        Rank cardRank = null;
+//        for (int i =0; i< 2; i++) {
+//            cardRank = (Rank)privateCards.get(i).getRank();
+//            removePossibleValues(map, cardRank.getPossibleSumValues());
+//        }
+//        for (int i =0; i< 2; i++) {
+//            cardRank = (Rank)publicCards.get(i).getRank();
+//            removePossibleValues(map, cardRank.getPossibleSumValues());
+//        }
+//
+//    }
 
     public void findRequiredScore(List<Integer> reqScore, Card card) {
         Rank rank = (Rank)card.getRank();
@@ -142,7 +142,7 @@ public class CleverPlayer extends Player {
         cardList.clear();
         cardType.clear();
         if (privateCards.size() == 3) {
-            System.out.println("SJCNSJCDBNJSDBJDJDJ");
+
             privateCard3 = privateCards.get(2);
             if (isThirteenCards(privateCard1, privateCard3)) {
 
@@ -329,7 +329,7 @@ public class CleverPlayer extends Player {
         super(position, cardsDealer);
     }
 
-    public Card selectCardToDiscard(int delayTime, Hand playingArea) {
+    public Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed) {
         this.playingArea = playingArea;
 
         Card selected = getCleverPlayerCard(getHand(), getPosition(), cardsPlayed, getCardsDealer().getPack().getCardList(), possibleCardsMap, delayTime);

@@ -136,7 +136,7 @@ public class LuckyThirdteen extends CardGame {
                     if (selected != null) {
                         selected.removeFromHand(true);
                     } else { // for when player runs out of auto movement sequence
-                        selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea);
+                        selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed);
                         selected.removeFromHand(true);
                     }
                 } else {
@@ -149,7 +149,7 @@ public class LuckyThirdteen extends CardGame {
                     HumanPlayer current = (HumanPlayer) players[currentPlayer];
                     setStatus("Player 0 is playing. Please double click on a card to discard");
                     cardsDealer.dealACardToHand(current.getHand(), pack);
-                    selected = current.selectCardToDiscard(delayTime, playingArea);
+                    selected = current.selectCardToDiscard(delayTime, playingArea, cardsPlayed);
                     selected.removeFromHand(true);
 
 //                } else if (players[currentPlayer] instanceof CleverPlayer) {
@@ -160,7 +160,7 @@ public class LuckyThirdteen extends CardGame {
 
                 }   else { // non-human player picking
                     setStatusText("Player " + currentPlayer + " thinking...");
-                    selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea);
+                    selected = players[currentPlayer].selectCardToDiscard(thinkingTime, playingArea, cardsPlayed);
                     selected.removeFromHand(true);
                 }
             }

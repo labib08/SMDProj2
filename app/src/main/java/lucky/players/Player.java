@@ -25,7 +25,7 @@ public abstract class Player extends Actor {
         return cardsDealer;
     }
 
-    public abstract Card selectCardToDiscard(int delayTime, Hand playingArea);
+    public abstract Card selectCardToDiscard(int delayTime, Hand playingArea, List<Card> cardsPlayed);
 
     public void setUpInitialCards(Card[] initialCards){ // sets up hand
         for (Card card : initialCards){
