@@ -352,10 +352,6 @@ public class CleverPlayer extends Player {
             observer.notify(playerIndex, cards);
         }
     }
-//    public Card selectCardToDiscardClever(int delayTime, List<Card> cardsPlayed) {
-//        Card selected = getCleverPlayerCard(getHand(), getPosition(), cardsPlayed, getCardsDealer().getPack(), possibleCardsMap, delayTime);
-//        return selected;
-//    }
 
     public Card findProbability(List<Integer> reqScorePriv1, List<Integer> reqScorePriv2, List<Integer> reqScorePriv3, List<Integer> reqScorePrivCards, HashMap<Integer, Integer> map, List<Card> privateCards) {
         int num = -1;
